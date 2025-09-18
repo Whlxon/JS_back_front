@@ -4,7 +4,7 @@ import { Film } from "../types";
 const films: Film[] = [
   { id: 1,
     title: "Inception",
-    director: "Christopher Nolanh",
+    director: "Christopher Nolan",
     duration: 148 
   },
   { id: 2,
