@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { Film } from "../types";
 
+let counter = 0;
+
 const films: Film[] = [
   { id: 1,
     title: "Inception",
@@ -43,8 +45,21 @@ const films: Film[] = [
     duration: 112
 }];
 
-const router = Router();
+const filmRouter = Router();
 
-router.get("/", (_req, res) => {
+filmRouter.use((_req, _res, next) => {
+    counter++;
+    console.log(
+        "GET counter : ",
+        counter
+    );
+    next();
+});
+
+filmRouter.get("/", (_req, res) => {
+    console.log("GET /")
     return res.json(films);
 });
+
+
+export { filmRouter }
