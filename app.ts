@@ -5,7 +5,12 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use('/film', filmRouter);
 
-app.use 
+app.get('/', (_req, res) => {
+    res.status(200).send('Welcome !')
+
+})
+
+app.use('/films', filmRouter);
+
 export default app;

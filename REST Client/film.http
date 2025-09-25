@@ -1,0 +1,22 @@
+@baseUrl = http://localhost:3000
+
+### Read all films
+GET {{baseUrl}}/films
+
+### Read a specific film with his id
+GET {{baseUrl}}/films/7
+
+### Get all film which have a duration above the minimum duration
+GET {{baseUrl}}/films?minimum-duration=120
+
+### Create a new film
+POST {{baseUrl}}/films
+Content-Type: application/json
+
+{
+    "id": 0,
+    "title": "bonjour",
+    "director": "Quentin Tarantino",
+    "duration": 154,
+    "budget": 1500
+}
