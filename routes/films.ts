@@ -112,11 +112,11 @@ filmRouter.post("/", (req, res) => {
     return res.status(400).send("Your body isn't a film, try again :/");
   }
 
-  for(let i = 0; i > films.length; i++){
+  for(let i = 0; i < films.length; i++){
     if(films[i].title == newFilm.title){
       return res.status(401).send("The film is already in the dataBase :/");
-    };
-  };
+    }
+  }
 
   films.push(newFilm);
 
