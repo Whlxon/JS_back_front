@@ -1,11 +1,12 @@
 import { Router } from "express";
 import { Film } from "../types";
 import { isNewFilm } from "../utils/type-guards";
+import { parse, serialize } from "../utils/json";
 
 let counter = 0;
-
-const films: Film[] = [
-  { id: 1,
+const path: string = "../data/films.json";
+let films: Film[] = [
+   { "id": 1,
     title: "Inception",
     director: "Christopher Nolan",
     duration: 148 
@@ -44,7 +45,10 @@ const films: Film[] = [
     title: "Your Name",
     director: "Makoto Shinkai",
     duration: 112
-}];
+    }
+  ];
+
+
 
 const filmRouter = Router();
 
@@ -59,6 +63,7 @@ filmRouter.use((_req, _res, next) => {
 
 filmRouter.get("/", (req, res) => {
     console.log("GET film/")
+    films = parse(path, films);
 
     if(req.query["minimum-duration"] != undefined){
       const filteredFilms = films.filter((film) => {
@@ -73,10 +78,12 @@ filmRouter.get("/", (req, res) => {
         return film.duration >= filterInt
 
       })
-
+      
+      serialize(path, films);
       return res.json(filteredFilms).status(200);
     }
-
+    
+    serialize(path, films);
     return res.status(200).json(films);
 
     
@@ -85,6 +92,7 @@ filmRouter.get("/", (req, res) => {
 filmRouter.get("/:id", (req, res) => {
 
   console.log('GET /film/:id')
+  films = parse(path, films);
 
   const id: number = parseInt(req.params.id);
 
@@ -92,15 +100,17 @@ filmRouter.get("/:id", (req, res) => {
     return res.status(400).send('The id is out of range ! \ntry again :/');
   }
 
+  serialize(path, films);
   return res.status(200).json(films[id-1]);
 
 });
 
 filmRouter.post("/", (req, res) => {
   console.log("POST /film")
+  films = parse(path, films);
 
   let newFilm: Film = req.body;
-  newFilm.id = films.length;
+  newFilm.id = films.length+1;
 
   if(newFilm.id === undefined &&
     newFilm.title === undefined &&
@@ -119,11 +129,13 @@ filmRouter.post("/", (req, res) => {
 
   films.push(newFilm);
 
+  serialize(path, films);
   return res.status(204);
 })
 
 filmRouter.delete('/:id', (req, res) => {
   const id= Number(req.params.id);
+  films = parse(path, films);
 
   if(id > films.length || id < 0){
     return res.status(400).send('The id is out of range ! \nTry again :/');
@@ -134,6 +146,7 @@ filmRouter.delete('/:id', (req, res) => {
     return res.status(404).send('Wrong id, try again :/');
   }
 
+  serialize(path, films);
   const deletedElement = films.splice(index, 1);
   return res.status(200).json(deletedElement[0]);
   
@@ -143,6 +156,8 @@ filmRouter.delete('/:id', (req, res) => {
 filmRouter.patch('/:id', (req, res) => {
   const id = Number(req.params.id);
   const film = films.find((film) => film.id === id);
+  films = parse(path, films);
+
   if (!film) {
     return res.sendStatus(404);
   }
@@ -183,6 +198,7 @@ filmRouter.patch('/:id', (req, res) => {
     film.imageUrl = imageUrl;
   }
 
+  serialize(path, films);
   return res.json(film);
 
 })
@@ -191,6 +207,7 @@ filmRouter.put('/:id', (req, res) => {
   let id = Number(req.params.id); /* We Take the id of the objet who we want to modify */
   const film = films.find((film) => film.id === id); /* If the id is correct and the object exist we take it and we save it in the variable */
   const body: unknown = req.body; /* We take the object in the body and we save it in the variable */
+  films = parse(path, films);
 
   id --;
 
@@ -198,6 +215,7 @@ filmRouter.put('/:id', (req, res) => {
 
     if(!film){
       films.push(body);
+      serialize(path, films);
       return res.status(200).json(body);
     }
 
@@ -221,6 +239,8 @@ filmRouter.put('/:id', (req, res) => {
     if(imageUrl){
       films[id].imageUrl = imageUrl;
     }
+
+    serialize(path, films);
 
     return res.status(200).json(films[id])
   

@@ -4,10 +4,10 @@
 GET {{baseUrl}}/films
 
 ### Read a specific film with his id
-GET {{baseUrl}}/films/9
+GET {{baseUrl}}/films/8
 
 ### Get all film which have a duration above the minimum duration
-GET {{baseUrl}}/films?minimum-duration=120
+GET {{baseUrl}}/films?minimum-duration=170
 
 ### Create a new film
 POST {{baseUrl}}/films
