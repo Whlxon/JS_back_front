@@ -4,7 +4,7 @@
  * @returns
  */
 
-import { NewPizza } from "../types";
+import { Film, NewPizza } from "../types";
 
 /**
  * Check if the value is a string and inform typescript of this
@@ -42,4 +42,21 @@ const isNewPizza = (body: unknown): body is NewPizza => {
   return true;
 };
 
-export { isString, isNumber, isNewPizza };
+const isNewFilm = (body: unknown): body is Film => {
+  if (
+    !body ||
+    typeof body !== "object" ||
+    ("title" in body && 
+      (typeof body.title !== "string")) ||
+    (("director" in body) && 
+      (typeof body.director !== "string")) ||
+    (("duration" in body) &&
+      (typeof body.duration !== "number"))
+  ) {
+    return false;
+  }
+
+  return true;
+}
+
+export { isString, isNumber, isNewPizza, isNewFilm};

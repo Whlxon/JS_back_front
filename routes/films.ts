@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { Film } from "../types";
+import { isNewFilm } from "../utils/type-guards";
 
 let counter = 0;
 
@@ -183,6 +184,19 @@ filmRouter.patch('/:id', (req, res) => {
   }
 
   return res.json(film);
+
+})
+
+filmRouter.put('/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const film = films.find((film) => film.id === id);
+  const body: unknown = req.body;
+
+  if(!isNewFilm(body)){
+    res.status(400).send("Your body isn't correct !\nTry again :/");
+  }
+
+  
 
 })
 

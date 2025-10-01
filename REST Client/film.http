@@ -35,3 +35,11 @@ Content-Type: application/json
 {
     "title":"Citronnade"
 }
+
+### We change all the informations that we put in the body
+PUT {{baseUrl}}/films/5
+Content-Type: application/json
+
+{
+    
+}
