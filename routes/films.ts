@@ -50,7 +50,7 @@ const filmRouter = Router();
 filmRouter.use((_req, _res, next) => {
     counter++;
     console.log(
-        "GET counter : ",
+        "Server Request Counter : ",
         counter
     );
     next();
@@ -87,13 +87,11 @@ filmRouter.get("/:id", (req, res) => {
 
   const id: number = parseInt(req.params.id);
 
-  try{
-    console.log(id);
-    return res.status(200).json(films[id]);
-  }catch(e){
-    console.log(e)
-    return res.status(400);
+  if(id > films.length || id < 0){
+    return res.status(400).send('The id is out of range ! \ntry again :/');
   }
+
+  return res.status(200).json(films[id-1]);
 
 });
 
@@ -108,19 +106,83 @@ filmRouter.post("/", (req, res) => {
     newFilm.duration === undefined &&
     newFilm.director === undefined
   ){
-    return res.status(400).send("Your body isn't a film, try again :/");
+    return res.status(400).send("Your body isn't a film, Try again :/");
   }
 
   for(let i = 0; i < films.length; i++){
-    if(films[i].title == newFilm.title){
-      return res.status(401).send("The film is already in the dataBase :/");
+    if(films[i].title == newFilm.title &&
+      films[i].description == newFilm.description){
+      return res.status(409).send("The film is already in the DataBase :/");
     }
   }
 
   films.push(newFilm);
 
   return res.status(204);
+})
 
+filmRouter.delete('/:id', (req, res) => {
+  const id= Number(req.params.id);
+
+  if(id > films.length || id < 0){
+    return res.status(400).send('The id is out of range ! \nTry again :/');
+  }
+
+  const index = films.findIndex((film) => film.id === id);
+  if(index === -1){
+    return res.status(404).send('Wrong id, try again :/');
+  }
+
+  const deletedElement = films.splice(index, 1);
+  return res.status(200).json(deletedElement[0]);
+  
+  
+});
+
+filmRouter.patch('/:id', (req, res) => {
+  const id = Number(req.params.id);
+  const film = films.find((film) => film.id === id);
+  if (!film) {
+    return res.sendStatus(404);
+  }
+
+  const body: unknown = req.body;
+
+  if (
+    !body ||
+    typeof body !== "object" ||
+    ("title" in body && 
+      (typeof body.title !== "string")) ||
+    (("director" in body) && 
+      (typeof body.director !== "string")) ||
+    (("duration" in body) &&
+      (typeof body.duration !== "number"))
+  ) {
+    return res.sendStatus(400);
+  }
+
+  const { title, director, duration, budget, description, imageUrl }: Partial<Film> = body;
+
+  if(title){
+    film.title = title;
+  }
+  if(director){
+    film.director = director;
+  }
+  if(duration){
+    film.duration = duration;
+  }
+  if(budget) {
+    film.budget = budget;
+  }
+  if(description){
+    film.description = description;
+  }
+  if(imageUrl){
+    film.imageUrl = imageUrl;
+  }
+
+  return res.json(film);
 
 })
 

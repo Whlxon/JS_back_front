@@ -4,7 +4,7 @@
 GET {{baseUrl}}/films
 
 ### Read a specific film with his id
-GET {{baseUrl}}/films/7
+GET {{baseUrl}}/films/9
 
 ### Get all film which have a duration above the minimum duration
 GET {{baseUrl}}/films?minimum-duration=120
@@ -24,3 +24,14 @@ Content-Type: application/json
 ### Get a film if the caracter specified in the query match with caracter in the title
 
 GET {{baseUrl}}/films?caracter-chaine=Ince
+
+### Delete an element in the film list
+DELETE {{baseUrl}}/films/8
+
+### Update the film identified by 5
+PATCH {{baseUrl}}/films/5
+Content-Type: application/json
+
+{
+    "title":"Citronnade"
+}
