@@ -188,16 +188,44 @@ filmRouter.patch('/:id', (req, res) => {
 })
 
 filmRouter.put('/:id', (req, res) => {
-  const id = Number(req.params.id);
-  const film = films.find((film) => film.id === id);
-  const body: unknown = req.body;
+  let id = Number(req.params.id); /* We Take the id of the objet who we want to modify */
+  const film = films.find((film) => film.id === id); /* If the id is correct and the object exist we take it and we save it in the variable */
+  const body: unknown = req.body; /* We take the object in the body and we save it in the variable */
 
-  if(!isNewFilm(body)){
-    res.status(400).send("Your body isn't correct !\nTry again :/");
-  }
+  id --;
 
+  if(isNewFilm(body)){
+
+    if(!film){
+      films.push(body);
+      return res.status(200).json(body);
+    }
+
+    const { title, director, duration, budget, description, imageUrl }: Partial<Film> = body;
+
+    if(title){
+      films[id].title = title;
+    }
+    if(director){
+      films[id].director = director;
+    }
+    if(duration){
+      films[id].duration = duration;
+    }
+    if(budget) {
+      films[id].budget = budget;
+    }
+    if(description){
+      films[id].description = description;
+    }
+    if(imageUrl){
+      films[id].imageUrl = imageUrl;
+    }
+
+    return res.status(200).json(films[id])
   
-
+  }
+  return res.status(400).send("Your body isn't correct !\nTry again :/");
 })
 
 export { filmRouter }

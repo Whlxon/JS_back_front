@@ -41,5 +41,5 @@ PUT {{baseUrl}}/films/5
 Content-Type: application/json
 
 {
-    
+    "title": "caca"
 }
