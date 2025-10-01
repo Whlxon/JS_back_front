@@ -20,3 +20,7 @@ Content-Type: application/json
     "duration": 154,
     "budget": 1500
 }
+
+### Get a film if the caracter specified in the query match with caracter in the title
+
+GET {{baseUrl}}/films?caracter-chaine=Ince

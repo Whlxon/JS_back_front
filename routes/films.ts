@@ -72,6 +72,7 @@ filmRouter.get("/", (req, res) => {
         return film.duration >= filterInt
 
       })
+
       return res.json(filteredFilms).status(200);
     }
 
@@ -79,8 +80,6 @@ filmRouter.get("/", (req, res) => {
 
     
 });
-
-
 
 filmRouter.get("/:id", (req, res) => {
 
