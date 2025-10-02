@@ -1,56 +1,12 @@
 import { Router } from "express";
 import { Film } from "../types";
-import { isNewFilm } from "../utils/type-guards";
-import { parse, serialize } from "../utils/json";
+import { createFilm, deleteFilm, readAllFilm, readFilmById, updateCreatefilm, updateFilm } from "../services/films";
 
-/*
-We create a list of film to have base to work on
-*/
+
 
 let counter = 0;
-const path: string = "./data/films.json";
-let films: Film[] = [
-   { "id": 1,
-    title: "Inception",
-    director: "Christopher Nolan",
-    duration: 148 
-  },
-  { id: 2,
-    title: "Parasite",
-    director: "Bong Joon-ho",
-    duration: 132 
-  },
-  { id: 3,
-    title: "The Godfather",
-    director: "Francis Ford Coppola",
-    duration: 175
-  },
-  { id: 4,
-    title: "Spirited Away",
-    director: "Hayao Miyazaki",
-    duration: 125
-  },
-  { id: 5,
-    title: "Interstellar",
-    director: "Christopher Nolan",
-    duration: 169
-  },
-  { id: 6,
-    title: "Whiplash",
-    director: "Damien Chazelle",
-    duration: 106
-  },
-  { id: 7,
-    title: "Pulp Fiction",
-    director: "Quentin Tarantino",
-    duration: 154
-  },
-  { id: 8,
-    title: "Your Name",
-    director: "Makoto Shinkai",
-    duration: 112
-    }
-  ];
+
+
 
 /*
 We create a middleware which count every request we're doing
@@ -73,28 +29,18 @@ We create a get path, to take every films we have in the db, and if there is a f
 
 filmRouter.get("/", (req, res) => {
     console.log("GET film/")
-    films = parse(path, films);
+    let film;
 
-    if(req.query["minimum-duration"] != undefined){
-      const filteredFilms = films.filter((film) => {
-        const filter = req.query["minimum-duration"]
-
-        if (typeof filter != "string"){
-          return res.send("Your query must be a string !").status(400);
-        }
-
-        const filterInt = parseInt(filter);
-
-        return film.duration >= filterInt
-
-      })
-      
-      serialize(path, films);
-      return res.json(filteredFilms).status(200);
+    if(req.query["minimum-duration"]){
+      film = readAllFilm(req.query["minimum-duration"])
+    }else{
+      film  = readAllFilm(undefined);
     }
-    
-    serialize(path, films);
-    return res.status(200).json(films);
+
+    if(film == undefined){
+
+    }
+    return res.status(200).json(film);
 
     
 });
@@ -104,18 +50,16 @@ We create a get path to get every film we have with the specific id
 */
 
 filmRouter.get("/:id", (req, res) => {
-
   console.log('GET /film/:id')
-  films = parse(path, films);
 
   const id: number = parseInt(req.params.id);
+  const film = readFilmById(id);
 
-  if(id > films.length || id < 0){
-    return res.status(400).send('The id is out of range ! \ntry again :/');
-  }
+  if(!film){
+    return res.status(409).send("Anything here, sorry try again :/")
+  };
 
-  serialize(path, films);
-  return res.status(200).json(films[id-1]);
+  return res.status(200).json(film);
 
 });
 
@@ -125,10 +69,9 @@ We create a post path, to add a film in the db, if there is the same, we send an
 
 filmRouter.post("/", (req, res) => {
   console.log("POST /film")
-  films = parse(path, films);
 
   let newFilm: Film = req.body;
-  newFilm.id = films.length+1;
+  newFilm.id = readAllFilm.length+1;
 
   if(newFilm.id === undefined &&
     newFilm.title === undefined &&
@@ -138,16 +81,10 @@ filmRouter.post("/", (req, res) => {
     return res.status(400).send("Your body isn't a film, Try again :/");
   }
 
-  for(let i = 0; i < films.length; i++){
-    if((films[i].title == newFilm.title) &&
-      (films[i].description == newFilm.description)){
-      return res.status(409).send("The film is already in the DataBase :/");
-    }
+  if(!createFilm(newFilm)){
+    return res.status(409).send("the film is maybe already in the DB")
   }
 
-  films.push(newFilm);
-
-  serialize(path, films);
   return res.status(204);
 })
 
@@ -157,19 +94,13 @@ We create a delete path the delete the fil with the specific id
 
 filmRouter.delete('/:id', (req, res) => {
   const id= Number(req.params.id);
-  films = parse(path, films);
 
-  if(id > films.length || id < 0){
-    return res.status(400).send('The id is out of range ! \nTry again :/');
+  const deletedElement = deleteFilm(id);
+
+  if(!deletedElement){
+    return res.status(400).send("somthing went wrong, try again :/");
   }
 
-  const index = films.findIndex((film) => film.id === id);
-  if(index === -1){
-    return res.status(404).send('Wrong id, try again :/');
-  }
-
-  serialize(path, films);
-  const deletedElement = films.splice(index, 1);
   return res.status(200).json(deletedElement[0]);
 });
 
@@ -180,13 +111,6 @@ create one
 
 filmRouter.patch('/:id', (req, res) => {
   const id = Number(req.params.id);
-  const film = films.find((film) => film.id === id);
-  films = parse(path, films);
-
-  if (!film) {
-    return res.sendStatus(404);
-  }
-
   const body: unknown = req.body;
 
   if (
@@ -202,28 +126,12 @@ filmRouter.patch('/:id', (req, res) => {
     return res.sendStatus(400);
   }
 
-  const { title, director, duration, budget, description, imageUrl }: Partial<Film> = body;
+  const film = updateFilm(id, body);
 
-  if(title){
-    film.title = title;
-  }
-  if(director){
-    film.director = director;
-  }
-  if(duration){
-    film.duration = duration;
-  }
-  if(budget) {
-    film.budget = budget;
-  }
-  if(description){
-    film.description = description;
-  }
-  if(imageUrl){
-    film.imageUrl = imageUrl;
+  if(!film){
+    return res.status(400).send("Something went wrong, try again :/")
   }
 
-  serialize(path, films);
   return res.json(film);
 
 });
@@ -234,47 +142,19 @@ We create a put path to modify all specifications that we set in the body
 
 filmRouter.put('/:id', (req, res) => {
   let id = Number(req.params.id); /* We Take the id of the objet who we want to modify */
-  const film = films.find((film) => film.id === id); /* If the id is correct and the object exist we take it and we save it in the variable */
-  const body: unknown = req.body; /* We take the object in the body and we save it in the variable */
-  films = parse(path, films);
+  
+  const body: Object = req.body; /* We take the object in the body and we save it in the variable */
 
   id --;
 
-  if(isNewFilm(body)){
+  const film = updateCreatefilm(id, body);
 
-    if(!film){
-      films.push(body);
-      serialize(path, films);
-      return res.status(200).json(body);
-    }
-
-    const { title, director, duration, budget, description, imageUrl }: Partial<Film> = body;
-
-    if(title){
-      films[id].title = title;
-    }
-    if(director){
-      films[id].director = director;
-    }
-    if(duration){
-      films[id].duration = duration;
-    }
-    if(budget) {
-      films[id].budget = budget;
-    }
-    if(description){
-      films[id].description = description;
-    }
-    if(imageUrl){
-      films[id].imageUrl = imageUrl;
-    }
-
-    serialize(path, films);
-
-    return res.status(200).json(films[id])
-  
+  if(!film){
+    res.status(400).send("Seomthing went wrong, try again :/");
   }
-  return res.status(400).send("Your body isn't correct !\nTry again :/");
+
+  return res.status(200).json(film);
+
 })
 
 export { filmRouter }

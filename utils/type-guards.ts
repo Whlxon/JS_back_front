@@ -4,7 +4,7 @@
  * @returns
  */
 
-import { Film, NewPizza } from "../types";
+import { Film } from "../types";
 
 /**
  * Check if the value is a string and inform typescript of this
@@ -18,28 +18,6 @@ const isString = (value: unknown): value is string => {
 /* Check if the value is a number and inform typescript of this */
 const isNumber = (value: unknown): value is number => {
   return typeof value === "number" && isFinite(value);
-};
-
-/**
- * Check if the body is a new pizza
- * @param body
- * @returns boolean
- */
-const isNewPizza = (body: unknown): body is NewPizza => {
-  if (
-    !body ||
-    typeof body !== "object" ||
-    !("title" in body) ||
-    !("content" in body) ||
-    body.title !== "string" ||
-    body.content !== "string" ||
-    !body.title.trim() ||
-    !body.content.trim()
-  ) {
-    return false;
-  }
-
-  return true;
 };
 
 const isNewFilm = (body: unknown): body is Film => {
@@ -59,4 +37,4 @@ const isNewFilm = (body: unknown): body is Film => {
   return true;
 }
 
-export { isString, isNumber, isNewPizza, isNewFilm};
+export { isString, isNumber, isNewFilm};

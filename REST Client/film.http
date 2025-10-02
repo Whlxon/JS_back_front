@@ -14,7 +14,7 @@ POST {{baseUrl}}/films
 Content-Type: application/json
 
 {
-    "title": "bonjour",
+    "title": "b",
     "director": "bonjour",
     "duration": 154,
     "budget": 1500
@@ -32,7 +32,7 @@ PATCH {{baseUrl}}/films/5
 Content-Type: application/json
 
 {
-    "title":"Citronnade"
+    "title":"test0"
 }
 
 ### We change all the informations that we put in the body
@@ -40,5 +40,5 @@ PUT {{baseUrl}}/films/5
 Content-Type: application/json
 
 {
-    "title": "caca"
+    "title": "test1"
 }
