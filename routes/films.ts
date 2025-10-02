@@ -3,6 +3,10 @@ import { Film } from "../types";
 import { isNewFilm } from "../utils/type-guards";
 import { parse, serialize } from "../utils/json";
 
+/*
+We create a list of film to have base to work on
+*/
+
 let counter = 0;
 const path: string = "../data/films.json";
 let films: Film[] = [
@@ -48,7 +52,9 @@ let films: Film[] = [
     }
   ];
 
-
+/*
+We create a middleware which count every request we're doing
+*/
 
 const filmRouter = Router();
 
@@ -60,6 +66,10 @@ filmRouter.use((_req, _res, next) => {
     );
     next();
 });
+
+/*
+We create a get path, to take every films we have in the db, and if there is a filter we apply it to the research
+*/
 
 filmRouter.get("/", (req, res) => {
     console.log("GET film/")
@@ -89,6 +99,10 @@ filmRouter.get("/", (req, res) => {
     
 });
 
+/*
+We create a get path to get every film we have with the specific id
+*/
+
 filmRouter.get("/:id", (req, res) => {
 
   console.log('GET /film/:id')
@@ -104,6 +118,10 @@ filmRouter.get("/:id", (req, res) => {
   return res.status(200).json(films[id-1]);
 
 });
+
+/*
+We create a post path, to add a film in the db, if there is the same, we send an error
+*/
 
 filmRouter.post("/", (req, res) => {
   console.log("POST /film")
@@ -133,6 +151,10 @@ filmRouter.post("/", (req, res) => {
   return res.status(204);
 })
 
+/*
+We create a delete path the delete the fil with the specific id
+*/
+
 filmRouter.delete('/:id', (req, res) => {
   const id= Number(req.params.id);
   films = parse(path, films);
@@ -149,9 +171,12 @@ filmRouter.delete('/:id', (req, res) => {
   serialize(path, films);
   const deletedElement = films.splice(index, 1);
   return res.status(200).json(deletedElement[0]);
-  
-  
 });
+
+/*
+We create a patch path to modify a specific film with the specific id and if he doesn't exist
+create one
+*/
 
 filmRouter.patch('/:id', (req, res) => {
   const id = Number(req.params.id);
@@ -201,7 +226,11 @@ filmRouter.patch('/:id', (req, res) => {
   serialize(path, films);
   return res.json(film);
 
-})
+});
+
+/*
+We create a put path to modify all specifications that we set in the body
+*/
 
 filmRouter.put('/:id', (req, res) => {
   let id = Number(req.params.id); /* We Take the id of the objet who we want to modify */
