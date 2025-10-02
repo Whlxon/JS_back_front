@@ -14,9 +14,8 @@ POST {{baseUrl}}/films
 Content-Type: application/json
 
 {
-    "id": 0,
     "title": "bonjour",
-    "director": "Quentin Tarantino",
+    "director": "bonjour",
     "duration": 154,
     "budget": 1500
 }

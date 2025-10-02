@@ -8,7 +8,7 @@ We create a list of film to have base to work on
 */
 
 let counter = 0;
-const path: string = "../data/films.json";
+const path: string = "./data/films.json";
 let films: Film[] = [
    { "id": 1,
     title: "Inception",
@@ -139,8 +139,8 @@ filmRouter.post("/", (req, res) => {
   }
 
   for(let i = 0; i < films.length; i++){
-    if(films[i].title == newFilm.title &&
-      films[i].description == newFilm.description){
+    if((films[i].title == newFilm.title) &&
+      (films[i].description == newFilm.description)){
       return res.status(409).send("The film is already in the DataBase :/");
     }
   }
