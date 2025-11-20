@@ -3,8 +3,9 @@ import './App.css'
 
 function App() {
   const [blague, setBlague] = useState();
+  const [refresh, setRefresh] = useState<Boolean>(false);
 
-  const handleJoke = () => {
+  const fetchJoke = () => {
     fetch("https://v2.jokeapi.dev/joke/Any?lang=fr")
     .then((response) => {
       if(!response.ok) throw new Error(`<JokeAPI Calling Error>: ${response} : ${response.statusText}`);
@@ -17,8 +18,13 @@ function App() {
   }
 
   useEffect(() => {
-    handleJoke();
-  })
+  fetchJoke();
+    const timer = setTimeout(() => {
+      setRefresh(!refresh)
+    }, 3000);
+    
+    return () => clearTimeout(timer);
+  }, [refresh]);
 
   return (
     <>
@@ -28,8 +34,8 @@ function App() {
       {blague && <h3>Catégorie: {blague?.category}</h3>}
 
       <div className="card">
-        <button onClick={() => {handleJoke()}}>
-          Faire apparaitre une blague
+        <button onClick={() => setRefresh(!refresh)}>
+          Refresh
         </button>
       </div>
     </>
